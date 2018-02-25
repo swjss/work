@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}
+Tag
+{% endblock %}
+{% block body %}
+<div class="row">
+    <div class="col-lg-9">
+        {% for post in posts %}
+        <h1>{{ post.title }}</h1>
+        <li>
+            {{ post.text | truncate(255) | safe }}
+            <a href="{{ url_for('posts', post_id=post.id) }}">Read me</a>
+        </li>
+        {% endfor %}
+    </div>
+    <div class="col-lg-3">
+        <div class="row">
+            <h5>
+                Recent:
+            </h5>
+            <ul>
+                {% for post in recent %}
+                <li>
+                    <a href="{{ url_for('posts', post_id=post.id) }}">{{ post.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="row">
+            <h5>
+                Tags:
+            </h5>
+            <ul>
+                {% for tag in top_tags %}
+                <li>
+                    <a href="{{ url_for('tag', tag_id=tag[0].id) }}">{{ tag[0].title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
