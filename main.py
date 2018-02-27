@@ -1,11 +1,23 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from config import DevConfig
 from sqlalchemy import func 
+from flask_wtf import Form
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Length
+
+
 
 app = Flask(__name__)
 app.config.from_object(DevConfig)
 db = SQLAlchemy(app)
+
+class CommentForm(Form):
+    name = StringField(
+        'Name',
+        validators=[DataRequired(), Length(max=255)]
+    )
+    text = TextAreaField(u'Comment', validators=[DataRequired()])
 
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -99,16 +111,21 @@ def home(page=1):
         top_tags=top_tags,
     )
 
-@app.route('/posts/<int:post_id>')
+@app.route('/posts/<int:post_id>', methods=('GET', 'POST'))
 def posts(post_id):
-    post = Post.query.get(post_id)
-    recent, top_tags = sidebar_data()
-    return render_template(
-        'posts.html',
-        post=post,
-        recent=recent,
-        top_tags=top_tags
-    )
+    form = CommentForm()
+    if request.method == 'GET':
+        post = Post.query.get(post_id)
+        recent, top_tags = sidebar_data()
+        return render_template(
+            'posts.html',
+            post=post,
+            recent=recent,
+            top_tags=top_tags,
+            form=form
+        )
+    elif request.method == 'POST':
+        return "<h1>hello world!</h1>"
 @app.route('/tag/<int:tag_id>')
 def tag(tag_id):
     tag = Tag.query.get(tag_id)
